@@ -1,7 +1,12 @@
 #ifndef REGRESSIONE_HPP 
 #define REGRESSIONE_HPP
 #include <cassert>
-//REGRESSIONE_HPP è un nome inventato, è una macro del preprocessore e si riferisce comunque a questo hpp
+#include <vector>
+
+struct Point {
+    double x;
+    double y;
+};
 
 struct Result {  
   double A{};  
@@ -10,19 +15,31 @@ struct Result {
 
 class Regression {
  private:
-  int N_{};          
-  double sium_x_{};  
-  double sium_y_{};
-  double sium_x2_ = 0;
-  double sium_xy_ = 0;
+  
+  std::vector<Point> points_{}; //si aggiunge un vector e la struct point per poter tener traccia dei vari punti aggiunti
+  
+  //int N_{};          
+
 
  public:
   void add(double x, double y);  
   
   Result fit() const  
   {
+    double sium_x_{};  
+    double sium_y_{};
+    double sium_x2_ = 0;
+    double sium_xy_ = 0;
 
-      assert(sium_x_!= 0 && N_>1 ); 
+    for (auto const& p : points_) {
+      sium_x_ += p.x;
+      sium_y_ += p.y;
+      sium_x2_ += p.x * p.x;
+      sium_xy_ += p.x * p.y; 
+    }
+    int N_=points_.size();
+
+    assert(sium_x_!= 0 && N_>1 ); 
     double Q = (sium_y_ * sium_x2_ - sium_x_ * sium_xy_) /
                (N_ * sium_x2_ - sium_x_ * sium_x_);
     double M = (N_ * sium_xy_ - sium_x_ * sium_y_) /
@@ -32,21 +49,6 @@ class Regression {
   }
 };
 
-/* se le dichiaravi qua e non su Regressione.cpp:
-inline auto fit(Regression const &reg) {  //se non metti inline, fit, non essendo dentro la classe, sarà definita sia su regressione lineare.cpp sia su regressione.cpp. if not def fa solo in modo che nella 
-//stessa traslation unit (quindi nello stesso file cpp che include lo stesso hpp più volte) se viene incluso lo stesso hpp più volte non dia errore
-      return reg.fit();
-  }
 
-inline void Regression::add(double x, double y) { //qua senza inline da lo stesso errore, essendo fuori dalla classe viene definita due volte
-    ++N_;
-    sium_x_ += x;
-    sium_y_ += y;
-    sium_x2_ += x * x;
-    sium_xy_ += x * y;
-} */
-
-Result fit(Regression const &reg); // per far sì che la funzione fit(Regressione const& reg) possa essere usata su Regressione-lineare.cpp, puoi dichiararla qua e 
-//e definirla poi su regressione.cpp, non puoi mettere però auto, ma il tipo giusto (in questo caso Result)
-
+Result fit(Regression const &reg); 
 #endif
