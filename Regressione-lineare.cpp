@@ -10,7 +10,7 @@ TEST_CASE("Testing Regression") {
   reg.add(0., 0.);
   reg.add(1., 1.);
 
-  auto result = reg.fit(); //se invece di fare reg.fit richiamavi il fit(Regression cont& reg), definita solo in regressione.cpp, non funzionava
+  auto result = reg.fit();
   CHECK(result.A == doctest::Approx(0));
   CHECK(result.B == doctest::Approx(1));
 }
